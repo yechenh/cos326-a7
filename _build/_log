@@ -16,7 +16,7 @@
 # Target: main_index.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main_index.cmo, file:main_index.ml, implem, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o main_index.cmo main_index.ml # cached
 # Target: inverted_index.ml.depends, tags: { extension:ml, file:inverted_index.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules inverted_index.ml > inverted_index.ml.depends
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules inverted_index.ml > inverted_index.ml.depends # cached
 # Target: sequence.ml.depends, tags: { extension:ml, file:sequence.ml, ocaml, ocamldep, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules sequence.ml > sequence.ml.depends # cached
 # Target: sequence.cmx, tags: { compile, extension:cmx, extension:ml, file:sequence.cmx, file:sequence.ml, implem, native, ocaml, quiet }
@@ -26,9 +26,9 @@
 # Target: util.cmx, tags: { compile, extension:cmx, extension:ml, file:util.cmx, file:util.ml, implem, native, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o util.cmx util.ml # cached
 # Target: inverted_index.cmx, tags: { compile, extension:cmx, extension:ml, file:inverted_index.cmx, file:inverted_index.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o inverted_index.cmx inverted_index.ml
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o inverted_index.cmx inverted_index.ml # cached
 # Target: main_index.cmx, tags: { compile, extension:cmx, extension:ml, file:main_index.cmx, file:main_index.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o main_index.cmx main_index.ml
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o main_index.cmx main_index.ml # cached
 # Target: main_index.native, tags: { dont_link_with, extension:native, file:main_index.native, link, native, ocaml, program, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt sequence.cmx util.cmx inverted_index.cmx main_index.cmx -o main_index.native
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt sequence.cmx util.cmx inverted_index.cmx main_index.cmx -o main_index.native # cached
 # Compilation successful.

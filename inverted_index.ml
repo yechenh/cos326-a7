@@ -37,7 +37,7 @@ let show_result (docs: Util.document S.t) {res_docid=i;res_begin=b;res_end=e} =
   let b' = max 0 (b-20) in
   let e' = min (String.length cts) (e+20) in
   let excerpt = String.sub cts b' (e'-b')  in
-  (print_int i; print_string ": "; print_string excerpt; print_string "\n")
+  (print_int i; print_string "/"; print_int b; print_string ": "; print_string excerpt; print_string "\n")
 
 
 (* These methods each compute an inverted index of the specified type 
@@ -137,12 +137,7 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       combine_two_seq base sorted_word_seq in 
       
   (* Insert each (word, location_sequence) pair into a map *)
-    let map_ref = ref(DMap.empty) in 
-    let _ = S.iter (fun x -> let w, loc = x in 
-      map_ref := DMap.add w loc !map_ref) final_word_seq 
-    in 
-    !map_ref
-    (* let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
+    let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
       let word, loc = x in DMap.singleton word loc
     in 
     let merge_two_map (xs:doc_loc_index) (ys: doc_loc_index) = 
@@ -154,7 +149,7 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       in 
       DMap.merge merge_aux xs ys 
     in 
-    S.map_reduce turn_pair_to_map merge_two_map DMap.empty final_word_seq *)
+    S.map_reduce turn_pair_to_map merge_two_map DMap.empty final_word_seq
 
 
 
@@ -180,21 +175,66 @@ print_string "))"
 let res = quicksort (S.seq_of_array (Array.of_list [1;4;2;3;5])) int_comparator
 let _ = S.iter (fun x->print_int x) res *)
 
-(* let leq x = x <=3
-let (after_f1, after_f2) = 
-  filter (S.seq_of_array (Array.of_list [1;4;2;3;5])) leq
-let _ = S.iter (fun x->print_int x) after_f1
-let _ = print_string "divider"
-let _ = S.iter (fun x->print_int x) after_f2 *)
-
 
 let search (dex: doc_loc_index) (query: string list) : result list =
-   failwith "implement me"
-   
-(* debugging framework 
+  let query_seq =  S.seq_of_array (Array.of_list query) in 
+  (* Turn each location into docID, word_start_position, word_end_position, char_start_position, char_end_position*)
+  let map_aux (loc: location): (int * int * int * int * int) = 
+    let a,b,c = loc in (a,b,b,c,c)
+  in 
+  let word_result_seq = S.map 
+    (fun x -> match DMap.find_opt (String.lowercase_ascii x) dex with 
+      | None -> S.empty ()
+      | Some v -> S.map map_aux v) 
+      query_seq
+  in
+  let union_of_two_loc_sequences (xs: (int * int * int * int * int) S.t)
+    (ys: (int * int * int * int * int) S.t): (int * int * int * int * int) S.t =
+    (* If it is the union with the base case then no need for the rest *)
+    if S.length xs = 0 then ys 
+    else if S.length ys = 0 then xs
+    else
+    let _, st, _, _, _ = S.nth xs 0 in 
+    if st = 0 then ys else
+    (* First, map each element in xs to be S.singleton (docID, 
+       word_start_position, new_word_end_position, char_start_position, new_char_end_position) if there is a position in ys that immediately 
+       follows the element in xs. Else, map it to be empty sequence.*)
+    let map_xs (x: (int * int * int * int * int)): 
+      (int * int * int * int * int) S.t = 
+      let docID, word_st, word_end, char_st, char_end = x in 
+      let go_through_ys_map (y: (int * int * int * int * int)): 
+        (int * int * int * int * int) S.t = 
+        let docID_y, word_st_y, word_end_y, char_st_y, char_end_y = y in
+        if docID = docID_y && word_st_y = word_end + 1 then 
+          S.singleton (docID_y, word_st, word_end_y, char_st, char_end_y) 
+        else S.empty()
+      in 
+      (* Second, flatten the sequence of sequence, which will then be either 
+         empty if there is nothing is ys that immedaitely follows the previous 
+         word, or a singleton sequence containing that position.*)
+      let temp = S.flatten (S.map go_through_ys_map ys) in
+      temp
+    in 
+    S.flatten (S.map map_xs xs) 
+  in 
+  let base = S.singleton (0, 0, 0, 0, 0) in
+  let seq = S.reduce union_of_two_loc_sequences base word_result_seq in 
+  let result_seq = S.map 
+    (fun x -> 
+    let docID, word_st, word_end, char_st, char_end = x in 
+    {res_docid = docID; res_begin = char_st; res_end = char_end}
+    ) seq 
+  in 
+  Array.to_list (S.array_of_seq result_seq)
+  
+(* debugging framework  *)
 let tolist s = Array.to_list (S.array_of_seq s)
 let docs = S.seq_of_array (Util.load_documents "data/test_index_1000.txt")
+(* let docs = S.seq_of_array (Util.load_documents "data/test_index_1.txt") *)
+let docs = S.seq_of_array (Util.load_documents "data/test_index_special.txt")
 let dex = make_index docs
-let rs = search dex ["for";"a";"year"]
+(* let rs = search dex ["statement";"with"] *)
+(* let rs = search dex ["one"; "one"] *)
+(* let rs = search dex ["for"; "a"] *)
+let rs = search dex ["for"; "a"; "year"]
 let _ = List.iter (show_result docs) rs
-*)
