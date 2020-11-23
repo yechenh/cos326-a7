@@ -228,13 +228,13 @@ let search (dex: doc_loc_index) (query: string list) : result list =
   Array.to_list (S.array_of_seq result_seq)
   
 (* debugging framework  *)
-let tolist s = Array.to_list (S.array_of_seq s)
-let docs = S.seq_of_array (Util.load_documents "data/test_index_1000.txt")
+(* let tolist s = Array.to_list (S.array_of_seq s) *)
+(* let docs = S.seq_of_array (Util.load_documents "data/test_index_1000.txt") *)
 (* let docs = S.seq_of_array (Util.load_documents "data/test_index_1.txt") *)
-let docs = S.seq_of_array (Util.load_documents "data/test_index_special.txt")
-let dex = make_index docs
+(* let docs = S.seq_of_array (Util.load_documents "data/test_index_special.txt") *)
+(* let dex = make_index docs *)
 (* let rs = search dex ["statement";"with"] *)
 (* let rs = search dex ["one"; "one"] *)
 (* let rs = search dex ["for"; "a"] *)
-let rs = search dex ["for"; "a"; "year"]
-let _ = List.iter (show_result docs) rs
+(* let rs = search dex ["for"; "a"; "year"] *)
+(* let _ = List.iter (show_result docs) rs *)
