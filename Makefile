@@ -1,5 +1,5 @@
 OCAMLBUILD=ocamlbuild
-OCBFLAGS= -no-links
+OCBFLAGS=
 
 # Note: on Windows, where symbolic links don't work,
 # you may wish to set   OCBFLAGS= -no-links
