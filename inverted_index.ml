@@ -50,7 +50,7 @@ let show_result (docs: Util.document S.t) {res_docid=i;res_begin=b;res_end=e} =
  *  String.lowercase_ascii converts a word uniformly to lower case *)
 
 (**** START OF SOLUTION ****)
-let filter (s: 'a S.t) (leq: 'a -> bool): 'a S.t S.t = 
+(* let filter (s: 'a S.t) (leq: 'a -> bool): 'a S.t S.t = 
   let aux_smaller x = if leq x then S.singleton x else S. empty () in 
   let aux_bigger x = if leq x then S.empty () else S.singleton x in 
   S.map (S.flatten) (S.cons (S.map aux_smaller s) 
@@ -68,7 +68,38 @@ let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t =
     S.append (S.append (S.nth sorted_two_subsequences 0) (S.singleton pivot))
       (S.nth sorted_two_subsequences 1)
   in 
-  quicksort_aux s
+  quicksort_aux s *)
+
+  let filter (s: (string * location) S.t) (pivot: string): 
+    ((string * location) S.t S.t * location S.t) = 
+    let aux_smaller x = let word, _ = x in if String.compare word pivot < 0 
+      then S.singleton x else S. empty () in 
+    let aux_bigger x = let word, _ = x in if String.compare word pivot > 0 
+      then S.singleton x else S.empty () in 
+    let subsequences = S.map S.flatten (S.cons (S.map aux_smaller s) 
+      (S.singleton (S.map aux_bigger s))) 
+    in 
+    let pivot_seq = S.flatten (S.map (fun x -> let word, loc = x in 
+      if word = pivot then S.singleton loc else S.empty ()) s)
+    in
+    (subsequences, pivot_seq)
+      
+  let quicksort (s: (string * location) S.t): (string * location S.t) S.t = 
+    let rec quicksort_aux (s: (string * location) S.t): 
+      (string * location S.t) S.t = 
+      if S.length s = 0 then S.empty () 
+      else 
+      let (pivot_word, pivot_loc) = S.nth s 0 in 
+      let (_, to_be_filtered) = S.split s 1 in 
+      let (two_sub_sequences, pivot_loc_seq) = 
+        filter to_be_filtered pivot_word 
+      in
+      let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
+      S.append (S.append (S.nth sorted_two_subsequences 0) 
+        (S.singleton (pivot_word, S.cons pivot_loc pivot_loc_seq)))
+        (S.nth sorted_two_subsequences 1)
+    in 
+    quicksort_aux s
 
 
 let make_index (docs: Util.document S.t) : doc_loc_index =
@@ -78,8 +109,8 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       let {Util.id=i';Util.title=t;Util.contents=cts} = doc in 
       let word_seq = S.seq_of_array (Array.of_list (Util.split_words cts)) in 
       
-      let one_to_n = S.tabulate (fun i -> i+1) (S.length word_seq) in 
-      let zipped_word_seq = S.zip (word_seq, one_to_n) in 
+      let zero_to_n = S.tabulate (fun i -> i) (S.length word_seq) in 
+      let zipped_word_seq = S.zip (word_seq, zero_to_n) in 
 
       let aux pair = 
         let (word, char_count), word_count = pair in 
@@ -89,6 +120,9 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
     in 
     let word_seq_seq = S.map process_doc docs in 
 
+    let word_seq = S.flatten word_seq_seq in
+    let final_word_seq = quicksort word_seq in 
+(* 
     (* sort the word_seq by the word, which is a sequence of 
     (string * location) *)
     let word_seq = S.flatten word_seq_seq in 
@@ -126,7 +160,8 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
     let base: (string * location S.t) S.t = S.empty () in 
     let final_word_seq = S.map_reduce turn_loc_to_loc_seq 
       combine_two_seq base sorted_word_seq in 
-      
+       *)
+
   (* Insert each (word, location_sequence) pair into a map *)
     (* let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
       let word, loc = x in DMap.singleton word loc

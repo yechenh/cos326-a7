@@ -239,7 +239,6 @@ let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) =
   let pivot_pop = S.map_reduce (fun x -> let pop, index = x in 
     if index = pivot then pop else 0) (+) 0 s 
   in
-  let _ = print_string "\n" in 
   (subsequences, pivot_pop)
     
 let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
@@ -322,48 +321,22 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     let zipped = S.zip (x, y) in 
     S.map (fun x -> let a,b=x in a+b) zipped 
   in 
-  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") twodim in 
   S.scan add_up_two_rows (S.repeat 0 cols) cols_summed
 
 (* Here, "summed_areas" is the result of precompute, *)
 let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 
-  (* let _ = print_string "here" in 
-  let l = max 0 l in 
-  let t = max 0 t in 
-  let r = min r ((S.length (S.nth summed_areas 0)) - 1) in 
-  let b = min b ((S. length summed_areas) - 1) in 
-  if l >= r || t >= b then 0 else  *)
+  let t = t-1 in let r = r-1 in let b = b-1 in let l = l-1 in 
   let get_i_j i j = 
     if i < 0 || j < 0 then 0 else
     S.nth (S.nth summed_areas i)  j 
   in 
-  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") summed_areas  
-  in 
-  let _ = print_int l in 
-  let _ = print_string "\n" in 
-  let _ = print_int r in 
-  let _ = print_string "\n" in 
-  let _ = print_int t in 
-  let _ = print_string "\n" in 
-  let _ = print_int b in 
-  let _ = print_string "\n" in 
-
-  let _ = print_int (get_i_j t r) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j t (l-1)) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j (b-1) r) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j (b-1) (l-1)) in 
-  let _ = print_string "\n" in 
   (get_i_j t r) - (get_i_j t (l-1)) - (get_i_j (b-1) r) + (get_i_j (b-1) (l-1))
 
 
 (* Unit testing *)
-let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,6);(1,3)|]
+(* let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,6);(1,3)|]
 let sample_onedim = make_onedim_grid sample_groups 10
 let sample_twodim = create_2d_matrix (2, 5) sample_onedim 
-let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") sample_twodim
 let rows = 2
 let cols = 5
 let prefix_sum x = S.scan (+) 0 x
@@ -380,7 +353,7 @@ let reversed_cols_summed = reverse cols_summed
 let reversed_rows_summed = S.scan add_up_two_rows 
   (S.repeat 0 cols) reversed_cols_summed
 let output = reverse reversed_rows_summed 
-let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") output 
+let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") output  *)
 
 
 

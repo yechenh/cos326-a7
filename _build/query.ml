@@ -72,12 +72,12 @@ let encompassing_area (groups: group S.t) : area =
  **************************************************************************)
 
 
-(*true if r contains g *)
+
 let contains_group (r: area) (g: group) : bool = 
   (g.lon >= r.left && g.lon < r.right) &&
   (g.lat <= r.top && g.lat > r.bottom)
 
-(*true if r1 contains r2 *)
+
 let contains_area (r1: area) (r2: area) : bool = 
   (r2.left >= r1.left && r2.left < r1.right) &&
   (r2.right <= r1.right && r2.right > r1.left) &&
@@ -228,15 +228,6 @@ see how to compute the answer  [ 0; 0; 1; 2; 0; 0; 1; 0; 0; 0 ].
 
 In fact, you should demonstrate this for real: 
 *)
-<<<<<<< Updated upstream
-
-let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,3);(1,6)|]
-
-let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t = 
-    S.empty() (* FIXME *)
-
-let sample_onedim = make_onedim_grid sample_groups 10;;
-=======
 let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) = 
   let aux_smaller x = let _, index = x in if index < pivot then S.singleton x 
     else S. empty () in 
@@ -248,7 +239,6 @@ let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) =
   let pivot_pop = S.map_reduce (fun x -> let pop, index = x in 
     if index = pivot then pop else 0) (+) 0 s 
   in
-  let _ = print_string "\n" in 
   (subsequences, pivot_pop)
     
 let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
@@ -294,25 +284,11 @@ let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t =
     (S.repeat (0, 0) (max - last_index - 1))
   in 
   S.map (fun x -> let a, _ = x in a) filled_zero 
->>>>>>> Stashed changes
 
 
 (* Now, from the one-dimensional matrix, you can form the two-dimensional
 matrix by doing a "tabulate" over rows, and for each row
 you take the appropriate slice of the 1-dim array.  For this 
-<<<<<<< Updated upstream
-you use S.split, which fortunately has work=1, span=1.
-
-END OF PARALLEL GRID INITIALIZATION ALGORITHM *)
-
-(**A sequential algorithm is easy:  just initialize the matrix
-to all zeros, then iterate through the groups,
-incrementing the appropriate grid position for each new
-population p.  In fact, I strongly recommend you start with
-that algorithm, for two reasons: *)
-let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t = 
-  (* failwith "pre: implement me" *)
-=======
 you use S.split, which fortunately has work=1, span=1. *)
 
 let create_2d_matrix (rows, cols) one_d_grid: int S.t S.t = 
@@ -325,67 +301,13 @@ let create_2d_matrix (rows, cols) one_d_grid: int S.t S.t =
 
 (* END OF PARALLEL GRID INITIALIZATION ALGORITHM *)
 
-let filter (s: 'a Sequence.S.t) (leq: 'a -> bool): ('a Sequence.S.t * 'a Sequence.S.t) = 
-  let element_to_pair (input: 'a): ('a Sequence.S.t * 'a Sequence.S.t) = 
-    if leq input then (Sequence.S.singleton input, Sequence.S.empty ()) else 
-      (Sequence.S.empty (), Sequence.S.singleton input)
-  in 
-  let combine_two_pairs p1 p2 = 
-    let fst_p1, snd_p1 = p1 in 
-    let fst_p2, snd_p2 = p2 in 
-    (Sequence.S.append fst_p1 fst_p2, Sequence.S.append snd_p1 snd_p2) 
-  in 
-  Sequence.S.map_reduce element_to_pair combine_two_pairs (Sequence.S.empty (), Sequence.S.empty ()) s
-
-let quicksort (s: 'a Sequence.S.t) (compare:'a -> 'a -> int): 'a Sequence.S.t = 
-  let rec quicksort_aux (s: 'a Sequence.S.t): 'a Sequence.S.t = 
-    if Sequence.S.length s <= 1 then s
-    else 
-    let pivot = Sequence.S.nth s 0 in 
-    let leq x = if compare x pivot <= 0 then true else false in 
-    let (_, to_be_filtered) = Sequence.S.split s 1 in 
-    let (smaller, bigger) = filter to_be_filtered leq in 
-    let two_sub_sequences = Sequence.S.cons smaller (Sequence.S.singleton bigger) in
-    let sorted_two_subsequences = Sequence.S.map quicksort_aux two_sub_sequences in 
-    Sequence.S.append (Sequence.S.append (Sequence.S.nth sorted_two_subsequences 0) (Sequence.S.singleton pivot))
-      (Sequence.S.nth sorted_two_subsequences 1)
-  in 
-  quicksort_aux s
-
-(*   (p,i,s,q,j) (p',i',s',q',j')
-where if j=i' then the result is    (p,i,s@(q+p')@s',q',j')
-and if j<i' then the result is  (p,i,s@q@z@p'@s',q',j')
-where z is a sequence of zeros, length i'-j'-1.
-Call this function join_chunks; then if you reduce join_chunks
-over your sorted groups sequence, you'll get the one-dimensional matrix.
-*)
-type chunk = (int * int * 'a Sequence.S.t * int * int)
-
-(* wip **)
-let join_chunks (chunk1:(int * int * 'a Sequence.S.t * int * int)) (chunk2:(int * int * 'a Sequence.S.t * int * int)) = 
-  let (p,i,s,q,j) = chunk1 in
-  let (p',i',s',q',j') = chunk2 in
-  if (j=i') then (p,i, S.append s (S.append (S.singleton (q+p') s')),q',j') 
-  else if (j < i') then let zeros = S.tabulate (fun i -> 0) (i'-j'-1) in 
-  let appended = S.append s 
-                (S.append (S.singleton q) 
-                (S.append (zeros 
-                (S.append (S.singleton p') s)))) in 
-  (p,i,appended,q',j')
-  else chunk1
-
-
 let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t = 
->>>>>>> Stashed changes
   (* this algorithm has two parts: 
      (1) create a grid where position (r,c) has the population
          living at those coordinates
      (2) from that, create a grid where at position (r,c) you
          have the total population living south of r and west of c.
    *)
-<<<<<<< Updated upstream
-=======
-<<<<<<<< Updated upstream:_build/query.ml
   let group_with_r_c = S.map (fun x ->
     let {pop=pop; lat=lat; lon=lon} = x in 
     let r,c = rowcol_of_latlon us_area (rows,cols) (lat,lon) in 
@@ -399,48 +321,22 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     let zipped = S.zip (x, y) in 
     S.map (fun x -> let a,b=x in a+b) zipped 
   in 
-  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") twodim in 
   S.scan add_up_two_rows (S.repeat 0 cols) cols_summed
 
 (* Here, "summed_areas" is the result of precompute, *)
 let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 
-  (* let _ = print_string "here" in 
-  let l = max 0 l in 
-  let t = max 0 t in 
-  let r = min r ((S.length (S.nth summed_areas 0)) - 1) in 
-  let b = min b ((S. length summed_areas) - 1) in 
-  if l >= r || t >= b then 0 else  *)
+  let t = t-1 in let r = r-1 in let b = b-1 in let l = l-1 in 
   let get_i_j i j = 
     if i < 0 || j < 0 then 0 else
     S.nth (S.nth summed_areas i)  j 
   in 
-  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") summed_areas  
-  in 
-  let _ = print_int l in 
-  let _ = print_string "\n" in 
-  let _ = print_int r in 
-  let _ = print_string "\n" in 
-  let _ = print_int t in 
-  let _ = print_string "\n" in 
-  let _ = print_int b in 
-  let _ = print_string "\n" in 
-
-  let _ = print_int (get_i_j t r) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j t (l-1)) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j (b-1) r) in 
-  let _ = print_string "\n" in 
-  let _ = print_int (get_i_j (b-1) (l-1)) in 
-  let _ = print_string "\n" in 
   (get_i_j t r) - (get_i_j t (l-1)) - (get_i_j (b-1) r) + (get_i_j (b-1) (l-1))
 
 
 (* Unit testing *)
-let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,6);(1,3)|]
+(* let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,6);(1,3)|]
 let sample_onedim = make_onedim_grid sample_groups 10
 let sample_twodim = create_2d_matrix (2, 5) sample_onedim 
-let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") sample_twodim
 let rows = 2
 let cols = 5
 let prefix_sum x = S.scan (+) 0 x
@@ -457,7 +353,7 @@ let reversed_cols_summed = reverse cols_summed
 let reversed_rows_summed = S.scan add_up_two_rows 
   (S.repeat 0 cols) reversed_cols_summed
 let output = reverse reversed_rows_summed 
-let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") output 
+let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") output  *)
 
 
 
@@ -465,352 +361,3 @@ let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; prin
 
 
 
-========
-  (* Parallel version *)
-  let matrix = S.tabulate (fun i -> 0) (cols*rows) in
-
-  let flatten_groups g = let {pop; lat; lon} = g in 
-  let (r,c) = rowcol_of_latlon us_area (rows,cols) (lat, lon) in
-  (pop, ((r*rows) + c)) in
-  let flattened_g = S.map flatten_groups groups in
-
-  let comparator (x: (int * int)) (y: (int * int)) = 
-    let (_,i1) = x in
-    let (_,i2) = y in
-    i1 - i2 in
-  let sorted_by_i = quicksort flattened_g comparator in
-
-  
-
-
->>>>>>> Stashed changes
-   (* Step 1: Sequential - Create grid with population *)
-   let matrix = S.tabulate (fun j -> (S.tabulate (fun i -> 0) cols)) rows in
-
-   let update_matrix g = let {pop; lat; lon} = g in 
-   let (r,c) = rowcol_of_latlon us_area (rows,cols) (lat, lon) in
-
-   let new_pop = (S.nth (S.nth matrix r) c) + pop in 
-   let fst_half,_ = S.split (S.nth matrix r) c in
-   let _,snd_half = S.split (S.nth matrix r) (c+1) in
-   let new_row = S.append fst_half (S.cons new_pop snd_half) in
-
-   let fst_half,_ = S.split matrix r in
-   let _,snd_half = S.split matrix (r+1) in 
-   S.append fst_half (S.cons new_row snd_half) in
-  
-   let combine_matrices m1 m2 = 
-    let zipped_outer = S.zip (m1,m2) in 
-    let zipped = S.map (
-      fun a -> let (r1,r2) = a in 
-      S.zip (r1,r2)) zipped_outer in 
-    S.map (
-      fun a -> (S.map (fun a' -> let (p1,p2) = a' in p1+p2) a)) zipped
-  in
-   let mat = S.map_reduce update_matrix combine_matrices matrix groups in
-
-  (* Step 2: Make summed area table *)
-  let colseq = Sequence.S.tabulate (fun i -> 0) cols in 
-  
-  S.scan (fun a -> (
-    fun b -> ( 
-      let added_row = S.scan (+) 0 b in 
-      let zipped = S.zip(a, added_row) in 
-      S.map (fun z -> let (p1,p2) = z in p1+p2 ) zipped ))) colseq mat
-
- 
-let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 
-<<<<<<< Updated upstream
-  (* failwith "look: implement me" *)
-  (* Here, "summed_areas" is the result of precompute, *)
-
-  (* (S.nth (S.nth summed_areas (t-1)) (l-1)) - (S.nth (S.nth summed_areas (b-1)) (l-1)) -
-  (S.nth (S.nth summed_areas (t-1)) (r-1)) + (S.nth (S.nth summed_areas (b-1)) (r-1)) *)
-
-  (* (S.nth (S.nth summed_areas t) l) - (S.nth (S.nth summed_areas b) l) -
-  (S.nth (S.nth summed_areas t) r + (S.nth (S.nth summed_areas b) r) *)
-
-=======
-  (* Here, "summed_areas" is the result of precompute, *)
-
->>>>>>> Stashed changes
-  (** (b as top, t as bottom) + reverse *)
-  if (b <= 1 && l<=1) then (S.nth (S.nth summed_areas (t-1)) (r-1)) (* bottom right*)
-  else if (b <= 1) then   (S.nth (S.nth summed_areas (t-1)) (r-1)) 
-                       - (S.nth (S.nth summed_areas (t-1)) (l-1)) (* bottom right - bottom left*)
-  else if (l <= 1) then   (S.nth (S.nth summed_areas (t-1)) (r-1))
-                       - (S.nth (S.nth summed_areas (b-1)) (r-1)) (* bottom right - top right*)
-  else (S.nth (S.nth summed_areas (t-1)) (r-1))
-     - (S.nth (S.nth summed_areas (t-1)) (l-1))
-     - (S.nth (S.nth summed_areas (b-1)) (r-1))
-     + (S.nth (S.nth summed_areas (b-1)) (l-1))
-
-
-<<<<<<< Updated upstream
-  (* (S.nth (S.nth summed_areas (b-1)) (l-1)) - (S.nth (S.nth summed_areas (t-1)) (l-1)) -
-  (S.nth (S.nth summed_areas (b-1)) (r-1)) + (S.nth (S.nth summed_areas (t-1)) (r-1)) *)
-
-
-  (* method from specs **)
-  (* (S.nth (S.nth summed_areas (t-1)) (r-1)) - (S.nth (S.nth summed_areas (b-1)) (r-1)) -
-  (S.nth (S.nth summed_areas (t-1)) (l-1)) + (S.nth (S.nth summed_areas (b-1)) (l-1)) *)
-
-  (* (S.nth (S.nth summed_areas t) r) - (S.nth (S.nth summed_areas b) r) -
-  (S.nth (S.nth summed_areas t) l) + (S.nth (S.nth summed_areas b) l) *)
-
-
-(*
-
-*)
-
-(*
-let zero_mat (rows,cols) =
-  Sequence.S.tabulate (fun j -> (Sequence.S.tabulate (fun i -> 1) cols)) rows ;;
-
-  Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) zero_mat(5,6))
-
-   let update_matrix pop matrix (r,c): int Sequence.S.t Sequence.S.t =
-
-   let new_pop = (Sequence.S.nth (Sequence.S.nth matrix r) c) + pop in 
-   let fst_half,_ = Sequence.S.split (Sequence.S.nth matrix r) c in
-   let _,snd_half = Sequence.S.split (Sequence.S.nth matrix r) (c+1) in
-   let new_row = Sequence.S.append fst_half (Sequence.S.cons new_pop snd_half) in
-
-   let fst_halfc,_ = Sequence.S.split matrix r in
-   let _,snd_halfc = Sequence.S.split matrix (r+1) in 
-
-   Sequence.S.append fst_halfc (Sequence.S.cons new_row snd_halfc)
-   __________________
-
-  let testg = Sequence.S.cons (50,2,2) (Sequence.S.cons (20,1,1) (Sequence.S.cons (100,0,1) (Sequence.S.empty ())))
-  Sequence.S.array_of_seq testg
-
-  let testg2 = Sequence.S.cons (50,2.,2.) (Sequence.S.cons (20,1.,1.) (Sequence.S.cons (100,0.,1.) (Sequence.S.empty ())))
-  Sequence.S.array_of_seq testg2
-
-  let getadd groups (rows,cols) =
-  let matrix = Sequence.S.tabulate (fun j -> (Sequence.S.tabulate (fun i -> 0) cols)) rows in
-
-   let update_matrix elem =
-    let (pop, r, c) = elem in
-   let new_pop = (Sequence.S.nth (Sequence.S.nth matrix r) c) + pop in 
-   let fst_half,_ = Sequence.S.split (Sequence.S.nth matrix r) c in
-   let _,snd_half = Sequence.S.split (Sequence.S.nth matrix r) (c+1) in
-   let new_row = Sequence.S.append fst_half (Sequence.S.cons new_pop snd_half) in
-
-   let fst_halfc,_ = Sequence.S.split matrix r in
-   let _,snd_halfc = Sequence.S.split matrix (r+1) in 
-   Sequence.S.append fst_halfc (Sequence.S.cons new_row snd_halfc)
-   in 
-   let combine_matrices m1 m2 = 
-    let zipped_outer = Sequence.S.zip (m1,m2) in 
-    let zipped = Sequence.S.map (
-      fun a -> let (r1,r2) = a in 
-      Sequence.S.zip (r1,r2)) zipped_outer in 
-    Sequence.S.map (
-      fun a -> (Sequence.S.map (fun a' -> let (p1,p2) = a' in p1+p2) a)) zipped
-
-in   let mat = Sequence.S.map_reduce update_matrix combine_matrices matrix groups
-
-in
-
-  let colseq = Sequence.S.tabulate (fun i -> 0) cols in 
-Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-(Sequence.S.scan (fun a -> (
-  fun b -> ( 
-    let added_row = Sequence.S.scan (+) 0 b in 
-    let zipped = Sequence.S.zip(a, added_row) in 
-    Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2 ) zipped ))) colseq mat));;
-
-
-
-
-  Sequence.S.array_of_seq 
-    (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-      (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) idk))
-
-     [ [ [], ], [] ]
-   Sequence.S.array_of_seq (Sequence.S.map (fun a ->  a) idk)
-
-   Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq (Sequence.S.map (fun a' -> Sequence.S.array_of_seq a')  a)) idk)
-   *)
-
-(*
-//nvm nope
-Sequence.S.map (
-fun a -> (Sequence.S.scan (+) 0 a)) matrix;;
-
-Sequence.S.scan (fun a -> Sequence.S.scan (+) 0 a) colmat matrix
-
-let rec sum col matrix =
-
-  Sequence.S.scan (fun a -> 
-let added_row = Sequence.S.scan (+) 0 a in 
-let zipped = Sequence.S.zip(added_row, colseq) in 
-Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2) zipped) colseq ones;;
-
-
-// this gets rows added 
-Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-(Sequence.S.scan (fun a -> (fun a z -> (let added_row = Sequence.S.scan (+) 0 a in 
-let zipped = Sequence.S.zip(added_row, z) in 
-Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2) zipped
-))) colseq ones)
-);;
-//does the saem
-Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-(Sequence.S.scan (fun a -> (fun b -> (Sequence.S.scan (+) 0 b) )) colseq ones)
-);;
-
-// regular 
-Sequence.S.scan (+) 0 n ==> [|0; 1; 3; 6; 10; 15; 21; 28; 36; 45|]
-
-// a is colseq, b is the elem
-// this gives each row with +1
-Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-(Sequence.S.scan (fun a -> (
-  fun b -> ( 
-    let zipped = Sequence.S.zip(a, b) in 
-    Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2 ) zipped ))) colseq ones));;
-
-Sequence.S.array_of_seq (Sequence.S.map (fun a -> Sequence.S.array_of_seq a) 
-(Sequence.S.scan (fun a -> (
-  fun b -> ( 
-    let added_row = Sequence.S.scan (+) 0 b in 
-    let zipped = Sequence.S.zip(a, added_row) in 
-    Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2 ) zipped ))) colseq ones));;
-
-*)
-
-(* 
-  let title_arr docseq = 
-    let acc = [] in
-    let f a = let {Util.id=i';Util.title=t;Util.contents=cts} = a in 
-    t::acc
-    in 
-    let whatever = Sequence.S.map f docseq in acc
-    
-    let title_arr docseq acc = 
-    let f a = let {Util.id=i';Util.title=t;Util.contents=cts} = a in t::acc 
-    in 
-    Sequence.S.map f docseq;;
-
-    *)
-
-
-
-
-
-
-(**
-
-let precompute (groups: group Sequence.S.t) (us_area: area) (rows,cols) : int Sequence.S.t Sequence.S.t = 
-  (* failwith "pre: implement me" *)
-  (* this algorithm has two parts: 
-     (1) create a grid where position (r,c) has the population
-         living at those coordinates
-     (2) from that, create a grid where at position (r,c) you
-         have the total population living south of r and west of c.
-   *)
-   (* Step 1: Sequential - Create grid with population *)
-   let matrix = Sequence.S.tabulate (fun j -> (Sequence.S.tabulate (fun i -> 0) cols)) rows in
-
-   let update_matrix g = let {pop; lat; lon} = g in 
-   let (r,c) = rowcol_of_latlon us_area (rows,cols) (lat, lon) in
-
-   let new_pop = (Sequence.S.nth (Sequence.S.nth matrix r) c) + pop in 
-   let fst_half,_ = Sequence.S.split (Sequence.S.nth matrix r) c in
-   let _,snd_half = Sequence.S.split (Sequence.S.nth matrix r) (c+1) in
-   let new_row = Sequence.S.append fst_half (Sequence.S.cons new_pop snd_half) in
-
-   let fst_half,_ = Sequence.S.split matrix r in
-   let _,snd_half = Sequence.S.split matrix (r+1) in 
-   Sequence.S.append fst_half (Sequence.S.cons new_row snd_half) in
-  
-   let combine_matrices m1 m2 = 
-    let zipped_outer = Sequence.S.zip (m1,m2) in 
-    let zipped = Sequence.S.map (
-      fun a -> let (r1,r2) = a in 
-      Sequence.S.zip (r1,r2)) zipped_outer in 
-    Sequence.S.map (
-      fun a -> (Sequence.S.map (fun a' -> let (p1,p2) = a' in p1+p2) a)) zipped
-  in
-   let mat = Sequence.S.map_reduce update_matrix combine_matrices matrix groups in
-
-  (* Step 2: Make summed area table *)
-  let colseq = Sequence.S.tabulate (fun i -> 0) cols in 
-  
-  Sequence.S.scan (fun a -> (
-    fun b -> ( 
-      let added_row = Sequence.S.scan (+) 0 b in 
-      let zipped = Sequence.S.zip(a, added_row) in 
-      Sequence.S.map (fun z -> let (p1,p2) = z in p1+p2 ) zipped ))) colseq mat
-
- 
-let population_lookup (summed_areas: int Sequence.S.t Sequence.S.t) (l,b,r,t) : int = 
-  (* failwith "look: implement me" *)
-  (* Here, "summed_areas" is the result of precompute, *)
-
-  (* (S.nth (S.nth summed_areas (t-1)) (l-1)) - (S.nth (S.nth summed_areas (b-1)) (l-1)) -
-  (S.nth (S.nth summed_areas (t-1)) (r-1)) + (S.nth (S.nth summed_areas (b-1)) (r-1)) *)
-
-  (* (S.nth (S.nth summed_areas t) l) - (S.nth (S.nth summed_areas b) l) -
-  (S.nth (S.nth summed_areas t) r) + (S.nth (S.nth summed_areas b) r) *)
-
-  (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1)) - (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (r-1)) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (l-1)) + (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (l-1))
-
-  (* (S.nth (S.nth summed_areas t) r) - (S.nth (S.nth summed_areas b) r) -
-  (S.nth (S.nth summed_areas t) l) + (S.nth (S.nth summed_areas b) l) *)
-
-
-  let population_lookup (summed_areas: int Sequence.S.t Sequence.S.t) (l,b,r,t) : int = 
-
-    // (b as top, t as bottom)
-  (Sequence.S.nth (Sequence.S.nth summed_areas b) l) - (Sequence.S.nth (Sequence.S.nth summed_areas t) l) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas b) r) + (Sequence.S.nth (Sequence.S.nth summed_areas t) r)
-
-  //for 1-indexed
-  (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (l-1)) - (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (l-1)) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (r-1)) + (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1))
-
-
-  (*D-C-B+A*)
-  (Sequence.S.nth (Sequence.S.nth summed_areas b) r) - (Sequence.S.nth (Sequence.S.nth summed_areas b) l) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas t) r) + (Sequence.S.nth (Sequence.S.nth summed_areas t) l)
-
-
-  (Sequence.S.nth (Sequence.S.nth summed_areas b) l) - (Sequence.S.nth (Sequence.S.nth summed_areas t) l) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas b) r) + (Sequence.S.nth (Sequence.S.nth summed_areas t) r)
-
-  (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1)) - (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (r-1)) -
-  (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (l-1)) + (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (l-1))
-
-
-  let population_lookup (summed_areas: int Sequence.S.t Sequence.S.t) (l,b,r,t) : int = 
-  (** (b as top, t as bottom) + reverse *)
-  if (b <= 1 && l<=1) then (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1)) (* bottom right*)
-  else if (b <= 1) then   (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1))
-                       - (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (l-1)) (* bottom right - bottom left*)
-  else if (l <= 1) then   (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1))
-                       - (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (r-1)) (* bottom right - top right*)
-  else (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (r-1))
-     - (Sequence.S.nth (Sequence.S.nth summed_areas (t-1)) (l-1))
-     - (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (r-1))
-     + (Sequence.S.nth (Sequence.S.nth summed_areas (b-1)) (l-1))
-  
-
-
-    let popscan group = Sequence.S.scan (+) 0 (Sequence.S.map (fun g -> let {pop=p;lat=_;lon=_} = g in p) group);;
-
-*)
-
-
-let get_pop groups = 
-  (S.map (fun g -> let {pop=p;lat=_;lon=_} = g in p) groups)
-=======
-(* 
-let get_pop groups = 
-  (S.map (fun g -> let {pop=p;lat=_;lon=_} = g in p) groups) *)
->>>>>>>> Stashed changes:query.ml
->>>>>>> Stashed changes

@@ -13,8 +13,5 @@ val precompute: group S.t -> area -> int*int -> int S.t S.t
 val population_lookup: int S.t S.t -> int*int*int*int -> int
 
 
-val get_pop: group S.t -> int S.t
-
-
 
 

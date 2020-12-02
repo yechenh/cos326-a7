@@ -27,8 +27,9 @@ let main =
   then DMap.iter (fun word seq ->
        print_string "Key: {";
        print_string word; print_string "} Values: {";
-       S.iter (fun (i,w,_) ->
-         print_int i; print_string ":"; print_int w; print_string " ") seq;
+       S.iter (fun (i,w,ch) ->
+         print_int i; print_string ":"; print_int w; print_string "/"; 
+         print_int ch; print_string " ") seq;
        print_string "}\n")
        index
   else ();
