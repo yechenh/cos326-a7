@@ -1,4 +1,5 @@
 ### Starting build.
+<<<<<<< Updated upstream
 # Target: test_query.ml.depends, tags: { extension:ml, file:test_query.ml, ocaml, ocamldep, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamldep.opt -modules test_query.ml > test_query.ml.depends
 # Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
@@ -7,9 +8,20 @@
 /Users/lauren/.opam/4.09.0/bin/ocamlc.opt -c -o parse.cmi parse.mli # cached
 # Target: query.mli.depends, tags: { extension:mli, file:query.mli, ocaml, ocamldep, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamldep.opt -modules query.mli > query.mli.depends # cached
+=======
+# Target: population.ml.depends, tags: { extension:ml, file:population.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules population.ml > population.ml.depends
+# Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules parse.mli > parse.mli.depends # cached
+# Target: parse.cmi, tags: { byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o parse.cmi parse.mli # cached
+# Target: query.mli.depends, tags: { extension:mli, file:query.mli, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.mli > query.mli.depends # cached
+>>>>>>> Stashed changes
 # Target: sequence.mli.depends, tags: { extension:mli, file:sequence.mli, ocaml, ocamldep, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamldep.opt -modules sequence.mli > sequence.mli.depends # cached
 # Target: sequence.cmi, tags: { byte, compile, extension:mli, file:sequence.mli, interf, ocaml, quiet }
+<<<<<<< Updated upstream
 /Users/lauren/.opam/4.09.0/bin/ocamlc.opt -c -o sequence.cmi sequence.mli # cached
 # Target: query.cmi, tags: { byte, compile, extension:mli, file:query.mli, interf, ocaml, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamlc.opt -c -o query.cmi query.mli # cached
@@ -21,9 +33,32 @@
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o parse.cmx parse.ml # cached
 # Target: query.ml.depends, tags: { extension:ml, file:query.ml, ocaml, ocamldep, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamldep.opt -modules query.ml > query.ml.depends # cached
+=======
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o sequence.cmi sequence.mli # cached
+# Target: query.cmi, tags: { byte, compile, extension:mli, file:query.mli, interf, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o query.cmi query.mli # cached
+# Target: population.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:population.cmo, file:population.ml, implem, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o population.cmo population.ml
++ /Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o population.cmo population.ml
+File "population.ml", line 60, characters 5-20:
+60 |      Pervasives.exit 0)
+          ^^^^^^^^^^^^^^^
+Alert deprecated: module Stdlib.Pervasives
+Use Stdlib instead.
+
+If you need to stay compatible with OCaml < 4.07, you can use the 
+stdlib-shims library: https://github.com/ocaml/stdlib-shims
+# Target: parse.ml.depends, tags: { extension:ml, file:parse.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules parse.ml > parse.ml.depends # cached
+# Target: parse.cmx, tags: { compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o parse.cmx parse.ml # cached
+# Target: query.ml.depends, tags: { extension:ml, file:query.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.ml > query.ml.depends # cached
+>>>>>>> Stashed changes
 # Target: sequence.ml.depends, tags: { extension:ml, file:sequence.ml, ocaml, ocamldep, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamldep.opt -modules sequence.ml > sequence.ml.depends # cached
 # Target: sequence.cmx, tags: { compile, extension:cmx, extension:ml, file:sequence.cmx, file:sequence.ml, implem, native, ocaml, quiet }
+<<<<<<< Updated upstream
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o sequence.cmx sequence.ml # cached
 # Target: query.cmx, tags: { compile, extension:cmx, extension:ml, file:query.cmx, file:query.ml, implem, native, ocaml, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml # cached
@@ -31,4 +66,22 @@
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o test_query.cmx test_query.ml
 # Target: test_query.native, tags: { dont_link_with, extension:native, file:test_query.native, link, native, ocaml, program, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt parse.cmx sequence.cmx query.cmx test_query.cmx -o test_query.native
+=======
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o sequence.cmx sequence.ml # cached
+# Target: query.cmx, tags: { compile, extension:cmx, extension:ml, file:query.cmx, file:query.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml # cached
+# Target: population.cmx, tags: { compile, extension:cmx, extension:ml, file:population.cmx, file:population.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
++ /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
+File "population.ml", line 60, characters 5-20:
+60 |      Pervasives.exit 0)
+          ^^^^^^^^^^^^^^^
+Alert deprecated: module Stdlib.Pervasives
+Use Stdlib instead.
+
+If you need to stay compatible with OCaml < 4.07, you can use the 
+stdlib-shims library: https://github.com/ocaml/stdlib-shims
+# Target: population.native, tags: { dont_link_with, extension:native, file:population.native, link, native, ocaml, program, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt parse.cmx sequence.cmx query.cmx population.cmx -o population.native
+>>>>>>> Stashed changes
 # Compilation successful.

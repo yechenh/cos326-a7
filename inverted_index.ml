@@ -50,30 +50,20 @@ let show_result (docs: Util.document S.t) {res_docid=i;res_begin=b;res_end=e} =
  *  String.lowercase_ascii converts a word uniformly to lower case *)
 
 (**** START OF SOLUTION ****)
-let filter (s: 'a S.t) (leq: 'a -> bool): ('a S.t * 'a S.t) = 
-  let element_to_pair (input: 'a): ('a S.t * 'a S.t) = 
-    if leq input then (S.singleton input, S.empty ()) else 
-      (S.empty (), S.singleton input)
-  in 
-  let combine_two_pairs p1 p2 = 
-    let fst_p1, snd_p1 = p1 in 
-    let fst_p2, snd_p2 = p2 in 
-    (S.append fst_p1 fst_p2, S.append snd_p1 snd_p2) 
-  in 
-  S.map_reduce element_to_pair combine_two_pairs (S.empty (), S.empty ()) s
+let filter (s: 'a S.t) (leq: 'a -> bool): 'a S.t S.t = 
+  let aux_smaller x = if leq x then S.singleton x else S. empty () in 
+  let aux_bigger x = if leq x then S.empty () else S.singleton x in 
+  S.map (S.flatten) (S.cons (S.map aux_smaller s) 
+    (S.singleton (S.map aux_bigger s)))
 
 let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
   let rec quicksort_aux (s: 'a S.t): 'a S.t = 
     if S.length s <= 1 then s
-    (* else if S.length s = 2 then 
-      if compare (S.nth s 0) (S.nth s 1) < 0 then s else 
-      S.cons (S.nth s 1) (S.singleton (S.nth s 2)) *)
-    else 
+    else
     let pivot = S.nth s 0 in 
     let leq x = if compare x pivot <= 0 then true else false in 
     let (_, to_be_filtered) = S.split s 1 in 
-    let (smaller, bigger) = filter to_be_filtered leq in 
-    let two_sub_sequences = S.cons smaller (S.singleton bigger) in
+    let two_sub_sequences = filter to_be_filtered leq in
     let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
     S.append (S.append (S.nth sorted_two_subsequences 0) (S.singleton pivot))
       (S.nth sorted_two_subsequences 1)
@@ -99,7 +89,8 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
     in 
     let word_seq_seq = S.map process_doc docs in 
 
-    (* sort the word_seq, which is a sequence of (string * location) *)
+    (* sort the word_seq by the word, which is a sequence of 
+    (string * location) *)
     let word_seq = S.flatten word_seq_seq in 
     let comparator (x: (string * location)) (y: (string * location)): int = 
       let (s1, _) = x in 
@@ -137,7 +128,7 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       combine_two_seq base sorted_word_seq in 
       
   (* Insert each (word, location_sequence) pair into a map *)
-    let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
+    (* let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
       let word, loc = x in DMap.singleton word loc
     in 
     let merge_two_map (xs:doc_loc_index) (ys: doc_loc_index) = 
@@ -149,7 +140,12 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       in 
       DMap.merge merge_aux xs ys 
     in 
-    S.map_reduce turn_pair_to_map merge_two_map DMap.empty final_word_seq
+    S.map_reduce turn_pair_to_map merge_two_map DMap.empty final_word_seq *)
+    let map_ref = ref(DMap.empty) in 
+    let _ = S.iter (fun x -> let w, loc = x in 
+      map_ref := DMap.add w loc !map_ref) final_word_seq 
+    in 
+    !map_ref
 
 
 
@@ -233,8 +229,8 @@ let search (dex: doc_loc_index) (query: string list) : result list =
 (* let docs = S.seq_of_array (Util.load_documents "data/test_index_1.txt") *)
 (* let docs = S.seq_of_array (Util.load_documents "data/test_index_special.txt") *)
 (* let dex = make_index docs *)
-(* let rs = search dex ["statement";"with"] *)
-(* let rs = search dex ["one"; "one"] *)
-(* let rs = search dex ["for"; "a"] *)
-(* let rs = search dex ["for"; "a"; "year"] *)
-(* let _ = List.iter (show_result docs) rs *)
+(* let rs = search dex ["statement";"with"]
+let rs = search dex ["one"; "one"]
+let rs = search dex ["for"; "a"] *)
+(* let rs = search dex ["for"; "a"; "year"]
+let _ = List.iter (show_result docs) rs *)

@@ -20,6 +20,7 @@ let slow_precompute (groups: groupseq) ((rows,cols):int*int) :
         int * (groupseq * (int*int) * Query.area) = 
   let us_area = Query.encompassing_area groups in
   let us_pop = Query.population_search groups us_area in 
+  let _ = print_string "!!!" in let _ = print_int us_pop in let _ = print_string "!!!" in 
   (us_pop, (groups, (rows,cols), us_area))
 
 	   
@@ -46,6 +47,7 @@ let measure_performance name
   let (us_pop, bundle) = 
        Sequence.Acc.reporting (name^":precompute")
          (precompute groups) rowscols in
+         let _ = print_string "!!!" in let _ = print_int us_pop in let _ = print_string "!!!" in 
   let pop = 
        Sequence.Acc.reporting (name^":compute")
           (compute (us_pop, bundle)) (l,b,r,t) in

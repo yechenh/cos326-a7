@@ -228,6 +228,7 @@ see how to compute the answer  [ 0; 0; 1; 2; 0; 0; 1; 0; 0; 0 ].
 
 In fact, you should demonstrate this for real: 
 *)
+<<<<<<< Updated upstream
 
 let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,3);(1,6)|]
 
@@ -235,11 +236,71 @@ let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t =
     S.empty() (* FIXME *)
 
 let sample_onedim = make_onedim_grid sample_groups 10;;
+=======
+let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) = 
+  let aux_smaller x = let _, index = x in if index < pivot then S.singleton x 
+    else S. empty () in 
+  let aux_bigger x = let _, index = x in if index > pivot then S.singleton x 
+    else S.empty () in 
+  let subsequences = S.map S.flatten (S.cons (S.map aux_smaller s) 
+    (S.singleton (S.map aux_bigger s))) 
+  in 
+  let pivot_pop = S.map_reduce (fun x -> let pop, index = x in 
+    if index = pivot then pop else 0) (+) 0 s 
+  in
+  let _ = print_string "\n" in 
+  (subsequences, pivot_pop)
+    
+let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
+  let rec quicksort_aux (s: 'a S.t): 'a S.t = 
+    if S.length s <= 1 then s
+    else 
+    let (pivot_pop, pivot_index) = S.nth s 0 in 
+    let (_, to_be_filtered) = S.split s 1 in 
+    let (two_sub_sequences, pop_sum) = filter to_be_filtered pivot_index in
+    let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
+    S.append (S.append (S.nth sorted_two_subsequences 0) 
+      (S.singleton (pivot_pop + pop_sum, pivot_index)))
+      (S.nth sorted_two_subsequences 1)
+  in 
+  quicksort_aux s
+
+let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t = 
+  if S.length s = 0 then S.repeat 0 max else
+  let comparator (x: int*int) (y: int*int): int =
+    let _, i1 = x in 
+    let _, i2 = y in 
+    i1-i2 
+  in 
+  let sorted = quicksort s comparator in 
+  let join_map (x: (int*int)): (int*int) S.t = S.singleton x in 
+  let join_reduce (b: (int * int) S.t) (x: (int*int) S.t) = 
+    if S.length b = 0 then x else
+    if S.length x = 0 then b else
+    let (b_last_pop, b_last_index) = S.nth b ((S.length b) - 1) in 
+    let (x_first_pop, x_first_index) = S.nth x 0 in 
+    if b_last_index = x_first_index then 
+      let first, _ = S.split b ((S.length b) - 1) in 
+      let _, last = S.split x 1 in 
+      S.append first (S.cons (b_last_pop + x_first_pop, b_last_index) last)
+    else S.append
+    (S.append b (S.repeat (0, 0) (x_first_index - b_last_index - 1))) x
+  in 
+  let filled_zero = S.map_reduce join_map join_reduce (S.empty ()) sorted in 
+  let (_, first_index) = S.nth filled_zero 0 in 
+  let (_, last_index) = S.nth filled_zero ((S.length filled_zero) - 1) in
+  let filled_zero = S.append 
+    (S.append (S.repeat (0, 0) first_index) filled_zero) 
+    (S.repeat (0, 0) (max - last_index - 1))
+  in 
+  S.map (fun x -> let a, _ = x in a) filled_zero 
+>>>>>>> Stashed changes
 
 
 (* Now, from the one-dimensional matrix, you can form the two-dimensional
 matrix by doing a "tabulate" over rows, and for each row
 you take the appropriate slice of the 1-dim array.  For this 
+<<<<<<< Updated upstream
 you use S.split, which fortunately has work=1, span=1.
 
 END OF PARALLEL GRID INITIALIZATION ALGORITHM *)
@@ -251,12 +312,178 @@ population p.  In fact, I strongly recommend you start with
 that algorithm, for two reasons: *)
 let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t = 
   (* failwith "pre: implement me" *)
+=======
+you use S.split, which fortunately has work=1, span=1. *)
+
+let create_2d_matrix (rows, cols) one_d_grid: int S.t S.t = 
+  let f i = 
+    let last_chopped_off, _ = S.split one_d_grid ((i+1) * cols) in
+    let _, result = S.split last_chopped_off (i * cols) in 
+    result 
+  in 
+  S.tabulate f rows  
+
+(* END OF PARALLEL GRID INITIALIZATION ALGORITHM *)
+
+let filter (s: 'a Sequence.S.t) (leq: 'a -> bool): ('a Sequence.S.t * 'a Sequence.S.t) = 
+  let element_to_pair (input: 'a): ('a Sequence.S.t * 'a Sequence.S.t) = 
+    if leq input then (Sequence.S.singleton input, Sequence.S.empty ()) else 
+      (Sequence.S.empty (), Sequence.S.singleton input)
+  in 
+  let combine_two_pairs p1 p2 = 
+    let fst_p1, snd_p1 = p1 in 
+    let fst_p2, snd_p2 = p2 in 
+    (Sequence.S.append fst_p1 fst_p2, Sequence.S.append snd_p1 snd_p2) 
+  in 
+  Sequence.S.map_reduce element_to_pair combine_two_pairs (Sequence.S.empty (), Sequence.S.empty ()) s
+
+let quicksort (s: 'a Sequence.S.t) (compare:'a -> 'a -> int): 'a Sequence.S.t = 
+  let rec quicksort_aux (s: 'a Sequence.S.t): 'a Sequence.S.t = 
+    if Sequence.S.length s <= 1 then s
+    else 
+    let pivot = Sequence.S.nth s 0 in 
+    let leq x = if compare x pivot <= 0 then true else false in 
+    let (_, to_be_filtered) = Sequence.S.split s 1 in 
+    let (smaller, bigger) = filter to_be_filtered leq in 
+    let two_sub_sequences = Sequence.S.cons smaller (Sequence.S.singleton bigger) in
+    let sorted_two_subsequences = Sequence.S.map quicksort_aux two_sub_sequences in 
+    Sequence.S.append (Sequence.S.append (Sequence.S.nth sorted_two_subsequences 0) (Sequence.S.singleton pivot))
+      (Sequence.S.nth sorted_two_subsequences 1)
+  in 
+  quicksort_aux s
+
+(*   (p,i,s,q,j) (p',i',s',q',j')
+where if j=i' then the result is    (p,i,s@(q+p')@s',q',j')
+and if j<i' then the result is  (p,i,s@q@z@p'@s',q',j')
+where z is a sequence of zeros, length i'-j'-1.
+Call this function join_chunks; then if you reduce join_chunks
+over your sorted groups sequence, you'll get the one-dimensional matrix.
+*)
+type chunk = (int * int * 'a Sequence.S.t * int * int)
+
+(* wip **)
+let join_chunks (chunk1:(int * int * 'a Sequence.S.t * int * int)) (chunk2:(int * int * 'a Sequence.S.t * int * int)) = 
+  let (p,i,s,q,j) = chunk1 in
+  let (p',i',s',q',j') = chunk2 in
+  if (j=i') then (p,i, S.append s (S.append (S.singleton (q+p') s')),q',j') 
+  else if (j < i') then let zeros = S.tabulate (fun i -> 0) (i'-j'-1) in 
+  let appended = S.append s 
+                (S.append (S.singleton q) 
+                (S.append (zeros 
+                (S.append (S.singleton p') s)))) in 
+  (p,i,appended,q',j')
+  else chunk1
+
+
+let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t = 
+>>>>>>> Stashed changes
   (* this algorithm has two parts: 
      (1) create a grid where position (r,c) has the population
          living at those coordinates
      (2) from that, create a grid where at position (r,c) you
          have the total population living south of r and west of c.
    *)
+<<<<<<< Updated upstream
+=======
+<<<<<<<< Updated upstream:_build/query.ml
+  let group_with_r_c = S.map (fun x ->
+    let {pop=pop; lat=lat; lon=lon} = x in 
+    let r,c = rowcol_of_latlon us_area (rows,cols) (lat,lon) in 
+    (pop, r*cols + c)) groups 
+  in 
+  let onedim = make_onedim_grid group_with_r_c (rows * cols) in 
+  let twodim = create_2d_matrix (rows, cols) onedim in
+  let prefix_sum x = S.scan (+) 0 x in 
+  let cols_summed = S.map prefix_sum twodim in 
+  let add_up_two_rows x y = 
+    let zipped = S.zip (x, y) in 
+    S.map (fun x -> let a,b=x in a+b) zipped 
+  in 
+  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") twodim in 
+  S.scan add_up_two_rows (S.repeat 0 cols) cols_summed
+
+(* Here, "summed_areas" is the result of precompute, *)
+let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 
+  (* let _ = print_string "here" in 
+  let l = max 0 l in 
+  let t = max 0 t in 
+  let r = min r ((S.length (S.nth summed_areas 0)) - 1) in 
+  let b = min b ((S. length summed_areas) - 1) in 
+  if l >= r || t >= b then 0 else  *)
+  let get_i_j i j = 
+    if i < 0 || j < 0 then 0 else
+    S.nth (S.nth summed_areas i)  j 
+  in 
+  let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") summed_areas  
+  in 
+  let _ = print_int l in 
+  let _ = print_string "\n" in 
+  let _ = print_int r in 
+  let _ = print_string "\n" in 
+  let _ = print_int t in 
+  let _ = print_string "\n" in 
+  let _ = print_int b in 
+  let _ = print_string "\n" in 
+
+  let _ = print_int (get_i_j t r) in 
+  let _ = print_string "\n" in 
+  let _ = print_int (get_i_j t (l-1)) in 
+  let _ = print_string "\n" in 
+  let _ = print_int (get_i_j (b-1) r) in 
+  let _ = print_string "\n" in 
+  let _ = print_int (get_i_j (b-1) (l-1)) in 
+  let _ = print_string "\n" in 
+  (get_i_j t r) - (get_i_j t (l-1)) - (get_i_j (b-1) r) + (get_i_j (b-1) (l-1))
+
+
+(* Unit testing *)
+let sample_groups = S.seq_of_array [|(1,2);(1,3);(1,6);(1,3)|]
+let sample_onedim = make_onedim_grid sample_groups 10
+let sample_twodim = create_2d_matrix (2, 5) sample_onedim 
+let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") sample_twodim
+let rows = 2
+let cols = 5
+let prefix_sum x = S.scan (+) 0 x
+let cols_summed = S.map prefix_sum sample_twodim 
+let reverse tt = 
+  let l = S.length tt in 
+  S.tabulate (fun i -> S.nth tt (l-i-1)) l
+
+let add_up_two_rows x y = 
+  let zipped = S.zip (x,y) in 
+  S.map (fun x -> let a,b=x in a+b) zipped 
+ 
+let reversed_cols_summed = reverse cols_summed 
+let reversed_rows_summed = S.scan add_up_two_rows 
+  (S.repeat 0 cols) reversed_cols_summed
+let output = reverse reversed_rows_summed 
+let _ = S.iter (fun x -> S.iter (fun y -> print_int y; print_string " ") x; print_string "\n") output 
+
+
+
+
+
+
+
+========
+  (* Parallel version *)
+  let matrix = S.tabulate (fun i -> 0) (cols*rows) in
+
+  let flatten_groups g = let {pop; lat; lon} = g in 
+  let (r,c) = rowcol_of_latlon us_area (rows,cols) (lat, lon) in
+  (pop, ((r*rows) + c)) in
+  let flattened_g = S.map flatten_groups groups in
+
+  let comparator (x: (int * int)) (y: (int * int)) = 
+    let (_,i1) = x in
+    let (_,i2) = y in
+    i1 - i2 in
+  let sorted_by_i = quicksort flattened_g comparator in
+
+  
+
+
+>>>>>>> Stashed changes
    (* Step 1: Sequential - Create grid with population *)
    let matrix = S.tabulate (fun j -> (S.tabulate (fun i -> 0) cols)) rows in
 
@@ -293,6 +520,7 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
 
  
 let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 
+<<<<<<< Updated upstream
   (* failwith "look: implement me" *)
   (* Here, "summed_areas" is the result of precompute, *)
 
@@ -302,6 +530,10 @@ let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int =
   (* (S.nth (S.nth summed_areas t) l) - (S.nth (S.nth summed_areas b) l) -
   (S.nth (S.nth summed_areas t) r + (S.nth (S.nth summed_areas b) r) *)
 
+=======
+  (* Here, "summed_areas" is the result of precompute, *)
+
+>>>>>>> Stashed changes
   (** (b as top, t as bottom) + reverse *)
   if (b <= 1 && l<=1) then (S.nth (S.nth summed_areas (t-1)) (r-1)) (* bottom right*)
   else if (b <= 1) then   (S.nth (S.nth summed_areas (t-1)) (r-1)) 
@@ -314,6 +546,7 @@ let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int =
      + (S.nth (S.nth summed_areas (b-1)) (l-1))
 
 
+<<<<<<< Updated upstream
   (* (S.nth (S.nth summed_areas (b-1)) (l-1)) - (S.nth (S.nth summed_areas (t-1)) (l-1)) -
   (S.nth (S.nth summed_areas (b-1)) (r-1)) + (S.nth (S.nth summed_areas (t-1)) (r-1)) *)
 
@@ -575,3 +808,9 @@ let population_lookup (summed_areas: int Sequence.S.t Sequence.S.t) (l,b,r,t) : 
 
 let get_pop groups = 
   (S.map (fun g -> let {pop=p;lat=_;lon=_} = g in p) groups)
+=======
+(* 
+let get_pop groups = 
+  (S.map (fun g -> let {pop=p;lat=_;lon=_} = g in p) groups) *)
+>>>>>>>> Stashed changes:query.ml
+>>>>>>> Stashed changes
