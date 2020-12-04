@@ -163,7 +163,7 @@ module ArraySeqAlt : S = struct
   let rec map_reduce (f: 'a -> 'b) (g: 'b -> 'b -> 'b) (base: 'b) (a: 'a t) : 'b =
     let l = length a in 
     if l = 0 then base else
-    if l = 1 then g (f (nth a 0)) base else
+    if l = 1 then f (nth a 0) else
     let left, right = split a (l/2) in 
     let subsequences = cons left (singleton right) in 
     let result_subsequences = map (map_reduce f g base) subsequences in 
@@ -259,6 +259,6 @@ module Accounting (M: S) : SCount =
     end
   end
 
-module Acc = Accounting(ArraySeq)
+module Acc = Accounting(ArraySeqAlt)
 module S = Acc.SM
     

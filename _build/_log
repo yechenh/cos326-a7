@@ -1,68 +1,34 @@
 ### Starting build.
-# Target: population.ml.depends, tags: { extension:ml, file:population.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules population.ml > population.ml.depends # cached
-# Target: parse.mli.depends, tags: { extension:mli, file:parse.mli, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules parse.mli > parse.mli.depends # cached
-# Target: parse.cmi, tags: { byte, compile, extension:mli, file:parse.mli, interf, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o parse.cmi parse.mli # cached
-# Target: query.mli.depends, tags: { extension:mli, file:query.mli, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.mli > query.mli.depends # cached
+# Target: main_index.ml.depends, tags: { extension:ml, file:main_index.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules main_index.ml > main_index.ml.depends # cached
+# Target: inverted_index.mli.depends, tags: { extension:mli, file:inverted_index.mli, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules inverted_index.mli > inverted_index.mli.depends # cached
 # Target: sequence.mli.depends, tags: { extension:mli, file:sequence.mli, ocaml, ocamldep, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules sequence.mli > sequence.mli.depends # cached
 # Target: sequence.cmi, tags: { byte, compile, extension:mli, file:sequence.mli, interf, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o sequence.cmi sequence.mli # cached
-# Target: query.cmi, tags: { byte, compile, extension:mli, file:query.mli, interf, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o query.cmi query.mli # cached
-# Target: population.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:population.cmo, file:population.ml, implem, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o population.cmo population.ml # cached
-# Target: parse.ml.depends, tags: { extension:ml, file:parse.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules parse.ml > parse.ml.depends # cached
-# Target: parse.cmx, tags: { compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o parse.cmx parse.ml # cached
-# Target: query.ml.depends, tags: { extension:ml, file:query.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.ml > query.ml.depends # cached
+# Target: util.mli.depends, tags: { extension:mli, file:util.mli, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules util.mli > util.mli.depends # cached
+# Target: util.cmi, tags: { byte, compile, extension:mli, file:util.mli, interf, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o util.cmi util.mli # cached
+# Target: inverted_index.cmi, tags: { byte, compile, extension:mli, file:inverted_index.mli, interf, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o inverted_index.cmi inverted_index.mli # cached
+# Target: main_index.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:main_index.cmo, file:main_index.ml, implem, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlc.opt -c -o main_index.cmo main_index.ml # cached
+# Target: inverted_index.ml.depends, tags: { extension:ml, file:inverted_index.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules inverted_index.ml > inverted_index.ml.depends # cached
 # Target: sequence.ml.depends, tags: { extension:ml, file:sequence.ml, ocaml, ocamldep, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules sequence.ml > sequence.ml.depends
+# Target: util.ml.depends, tags: { extension:ml, file:util.ml, ocaml, ocamldep, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules util.ml > util.ml.depends # cached
+# Target: util.cmx, tags: { compile, extension:cmx, extension:ml, file:util.cmx, file:util.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o util.cmx util.ml # cached
 # Target: sequence.cmx, tags: { compile, extension:cmx, extension:ml, file:sequence.cmx, file:sequence.ml, implem, native, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o sequence.cmx sequence.ml
-# Target: query.cmx, tags: { compile, extension:cmx, extension:ml, file:query.cmx, file:query.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml
-+ /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml
-File "query.ml", line 58, characters 14-33:
-58 |     let inf = Pervasives.infinity in 
-                   ^^^^^^^^^^^^^^^^^^^
-Alert deprecated: module Stdlib.Pervasives
-Use Stdlib instead.
-
-If you need to stay compatible with OCaml < 4.07, you can use the 
-stdlib-shims library: https://github.com/ocaml/stdlib-shims
-File "query.ml", line 59, characters 15-38:
-59 |     let ninf = Pervasives.neg_infinity in 
-                    ^^^^^^^^^^^^^^^^^^^^^^^
-Alert deprecated: module Stdlib.Pervasives
-Use Stdlib instead.
-
-If you need to stay compatible with OCaml < 4.07, you can use the 
-stdlib-shims library: https://github.com/ocaml/stdlib-shims
-File "query.ml", line 251, characters 20-31:
-251 |     let (pivot_pop, pivot_index) = S.nth s 0 in 
-                          ^^^^^^^^^^^
-Warning 26: unused variable pivot_index.
-File "query.ml", line 251, characters 9-18:
-251 |     let (pivot_pop, pivot_index) = S.nth s 0 in 
-               ^^^^^^^^^
-Warning 26: unused variable pivot_pop.
-# Target: population.cmx, tags: { compile, extension:cmx, extension:ml, file:population.cmx, file:population.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
-+ /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
-File "population.ml", line 58, characters 5-20:
-58 |      Pervasives.exit 0)
-          ^^^^^^^^^^^^^^^
-Alert deprecated: module Stdlib.Pervasives
-Use Stdlib instead.
-
-If you need to stay compatible with OCaml < 4.07, you can use the 
-stdlib-shims library: https://github.com/ocaml/stdlib-shims
-# Target: population.native, tags: { dont_link_with, extension:native, file:population.native, link, native, ocaml, program, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt parse.cmx sequence.cmx query.cmx population.cmx -o population.native
+# Target: inverted_index.cmx, tags: { compile, extension:cmx, extension:ml, file:inverted_index.cmx, file:inverted_index.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o inverted_index.cmx inverted_index.ml # cached
+# Target: main_index.cmx, tags: { compile, extension:cmx, extension:ml, file:main_index.cmx, file:main_index.ml, implem, native, ocaml, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o main_index.cmx main_index.ml # cached
+# Target: main_index.native, tags: { dont_link_with, extension:native, file:main_index.native, link, native, ocaml, program, quiet }
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt sequence.cmx util.cmx inverted_index.cmx main_index.cmx -o main_index.native
 # Compilation successful.
