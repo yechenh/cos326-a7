@@ -266,6 +266,6 @@ module Accounting (M: S) : SCount =
     end
   end
 
-module Acc = Accounting(ArraySeqAlt)
+module Acc = Accounting(ArraySeq)
 module S = Acc.SM
     

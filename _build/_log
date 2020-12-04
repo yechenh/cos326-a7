@@ -45,16 +45,7 @@ Use Stdlib instead.
 If you need to stay compatible with OCaml < 4.07, you can use the 
 stdlib-shims library: https://github.com/ocaml/stdlib-shims
 # Target: population.cmx, tags: { compile, extension:cmx, extension:ml, file:population.cmx, file:population.ml, implem, native, ocaml, quiet }
-/Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
-+ /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
-File "population.ml", line 58, characters 5-20:
-58 |      Pervasives.exit 0)
-          ^^^^^^^^^^^^^^^
-Alert deprecated: module Stdlib.Pervasives
-Use Stdlib instead.
-
-If you need to stay compatible with OCaml < 4.07, you can use the 
-stdlib-shims library: https://github.com/ocaml/stdlib-shims
+/Users/lauren/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml # cached
 # Target: population.native, tags: { dont_link_with, extension:native, file:population.native, link, native, ocaml, program, quiet }
 /Users/lauren/.opam/4.09.0/bin/ocamlopt.opt parse.cmx sequence.cmx query.cmx population.cmx -o population.native
 # Compilation successful.
