@@ -233,9 +233,11 @@ let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) =
     else S. empty () in 
   let aux_bigger x = let _, index = x in if index > pivot then S.singleton x 
     else S.empty () in 
-  let subsequences = S.map S.flatten (S.cons (S.map aux_smaller s) 
-    (S.singleton (S.map aux_bigger s))) 
+  let before_flatten = S.tabulate (fun i -> 
+    if i = 0 then S.map aux_smaller s 
+    else S.map aux_bigger s) 2 
   in 
+  let subsequences = S.map S.flatten before_flatten in 
   let pivot_pop = S.map_reduce (fun x -> let pop, index = x in 
     if index = pivot then pop else 0) (+) 0 s 
   in
@@ -243,14 +245,15 @@ let filter (s: 'a S.t) (pivot: 'b): ('a S.t S.t * int) =
     
 let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
   let rec quicksort_aux (s: 'a S.t): 'a S.t = 
-    if S.length s <= 1 then s
+    let l = S.length s in 
+    if l <= 1 then s
     else 
     let (pivot_pop, pivot_index) = S.nth s 0 in 
-    let (_, to_be_filtered) = S.split s 1 in 
-    let (two_sub_sequences, pop_sum) = filter to_be_filtered pivot_index in
+    let (_, pivot_index) = S.nth s (l/2) in 
+    let (two_sub_sequences, pop_sum) = filter s pivot_index in
     let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
     S.append (S.append (S.nth sorted_two_subsequences 0) 
-      (S.singleton (pivot_pop + pop_sum, pivot_index)))
+      (S.singleton (pop_sum, pivot_index)))
       (S.nth sorted_two_subsequences 1)
   in 
   quicksort_aux s
@@ -285,6 +288,13 @@ let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t =
   in 
   S.map (fun x -> let a, _ = x in a) filled_zero 
 
+let make_one_dim_grid_v2 (s: (int*int) S.t) (max: int) : int S.t = 
+  let aux i = 
+    let aux_map x = let pop, index = x in if index = i then pop else 0 in 
+    S.map_reduce aux_map (+) 0 s 
+  in 
+  S.tabulate aux max
+
 
 (* Now, from the one-dimensional matrix, you can form the two-dimensional
 matrix by doing a "tabulate" over rows, and for each row
@@ -313,7 +323,8 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     let r,c = rowcol_of_latlon us_area (rows,cols) (lat,lon) in 
     (pop, r*cols + c)) groups 
   in 
-  let onedim = make_onedim_grid group_with_r_c (rows * cols) in 
+  (* let onedim = make_onedim_grid group_with_r_c (rows * cols) in  *)
+  let onedim = make_one_dim_grid_v2 group_with_r_c (rows * cols) in 
   let twodim = create_2d_matrix (rows, cols) onedim in
   let prefix_sum x = S.scan (+) 0 x in 
   let cols_summed = S.map prefix_sum twodim in 
@@ -322,6 +333,7 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     S.map (fun x -> let a,b=x in a+b) zipped 
   in 
   S.scan add_up_two_rows (S.repeat 0 cols) cols_summed
+
 
 (* Here, "summed_areas" is the result of precompute, *)
 let population_lookup (summed_areas: int S.t S.t) (l,b,r,t) : int = 

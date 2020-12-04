@@ -105,6 +105,11 @@ let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t =
 let make_index (docs: Util.document S.t) : doc_loc_index =
    (* Process each document in parallel and turn each doc into a sequence of 
     (word, location) *)
+    let reverse tt = 
+      let l = S.length tt in 
+      S.tabulate (fun i -> S.nth tt (l-i-1)) (S.length tt)
+    in 
+    let docs = reverse docs in 
     let process_doc (doc: Util.document): (string * location) S.t = 
       let {Util.id=i';Util.title=t;Util.contents=cts} = doc in 
       let word_seq = S.seq_of_array (Array.of_list (Util.split_words cts)) in 

@@ -50,25 +50,6 @@ let show_result (docs: Util.document S.t) {res_docid=i;res_begin=b;res_end=e} =
  *  String.lowercase_ascii converts a word uniformly to lower case *)
 
 (**** START OF SOLUTION ****)
-(* let filter (s: 'a S.t) (leq: 'a -> bool): 'a S.t S.t = 
-  let aux_smaller x = if leq x then S.singleton x else S. empty () in 
-  let aux_bigger x = if leq x then S.empty () else S.singleton x in 
-  S.map (S.flatten) (S.cons (S.map aux_smaller s) 
-    (S.singleton (S.map aux_bigger s)))
-
-let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t = 
-  let rec quicksort_aux (s: 'a S.t): 'a S.t = 
-    if S.length s <= 1 then s
-    else
-    let pivot = S.nth s 0 in 
-    let leq x = if compare x pivot <= 0 then true else false in 
-    let (_, to_be_filtered) = S.split s 1 in 
-    let two_sub_sequences = filter to_be_filtered leq in
-    let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
-    S.append (S.append (S.nth sorted_two_subsequences 0) (S.singleton pivot))
-      (S.nth sorted_two_subsequences 1)
-  in 
-  quicksort_aux s *)
 
   let filter (s: (string * location) S.t) (pivot: string): 
     ((string * location) S.t S.t * location S.t) = 
@@ -104,7 +85,12 @@ let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t =
 
 let make_index (docs: Util.document S.t) : doc_loc_index =
    (* Process each document in parallel and turn each doc into a sequence of 
-    (word, location) *)
+    (word, location sequence) *)
+    let reverse tt = 
+      let l = S.length tt in 
+      S.tabulate (fun i -> S.nth tt (l-i-1)) (S.length tt)
+    in 
+    let docs = reverse docs in 
     let process_doc (doc: Util.document): (string * location) S.t = 
       let {Util.id=i';Util.title=t;Util.contents=cts} = doc in 
       let word_seq = S.seq_of_array (Array.of_list (Util.split_words cts)) in 
@@ -119,63 +105,8 @@ let make_index (docs: Util.document S.t) : doc_loc_index =
       S.map aux zipped_word_seq
     in 
     let word_seq_seq = S.map process_doc docs in 
-
     let word_seq = S.flatten word_seq_seq in
     let final_word_seq = quicksort word_seq in 
-(* 
-    (* sort the word_seq by the word, which is a sequence of 
-    (string * location) *)
-    let word_seq = S.flatten word_seq_seq in 
-    let comparator (x: (string * location)) (y: (string * location)): int = 
-      let (s1, _) = x in 
-      let (s2, _) = y in 
-      String.compare s1 s2
-    in 
-    let sorted_word_seq = quicksort word_seq comparator in 
-
-    (* Combine the sorted (word, location) tuple sequences *)
-    let turn_loc_to_loc_seq 
-      (x: (string * location)): (string * location S.t) S.t = 
-      let word, loc = x in S.singleton (word, S.singleton loc)
-    in 
-    let combine_two_seq (xs: (string * location S.t) S.t) 
-      (ys: (string * location S.t) S.t): (string * location S.t) S.t = 
-      if S.length xs = 0 then ys 
-      else if S.length ys = 0 then xs 
-      else 
-      let fst_seq_last = S.nth xs ((S.length xs) - 1) in 
-      let snd_seq_first = S.nth ys 0 in 
-      let first_word, first_loc_seq = fst_seq_last in 
-      let second_word, second_loc_seq = snd_seq_first in 
-      if String.equal first_word second_word then 
-        let first_part, _ = S.split xs ((S.length xs) - 1) in 
-        let _, last_part = S.split ys 1 in 
-        let middle_part = S.singleton (first_word, 
-          S.append first_loc_seq second_loc_seq) 
-        in 
-        S.append (S.append first_part middle_part) last_part
-      else
-        S.append xs ys
-    in 
-    let base: (string * location S.t) S.t = S.empty () in 
-    let final_word_seq = S.map_reduce turn_loc_to_loc_seq 
-      combine_two_seq base sorted_word_seq in 
-       *)
-
-  (* Insert each (word, location_sequence) pair into a map *)
-    (* let turn_pair_to_map (x: (string * location S.t)): doc_loc_index = 
-      let word, loc = x in DMap.singleton word loc
-    in 
-    let merge_two_map (xs:doc_loc_index) (ys: doc_loc_index) = 
-      let merge_aux k x y = 
-        match x, y with 
-        | Some x, Some y -> failwith "Should not have duplicate words"
-        | Some _, None -> x
-        | None, _ -> y
-      in 
-      DMap.merge merge_aux xs ys 
-    in 
-    S.map_reduce turn_pair_to_map merge_two_map DMap.empty final_word_seq *)
     let map_ref = ref(DMap.empty) in 
     let _ = S.iter (fun x -> let w, loc = x in 
       map_ref := DMap.add w loc !map_ref) final_word_seq 
