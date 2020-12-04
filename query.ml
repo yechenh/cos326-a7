@@ -248,7 +248,7 @@ let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t =
     let l = S.length s in 
     if l <= 1 then s
     else 
-    let (pivot_pop, pivot_index) = S.nth s 0 in 
+    (* let (pivot_pop, pivot_index) = S.nth s 0 in  *)
     let (_, pivot_index) = S.nth s (l/2) in 
     let (two_sub_sequences, pop_sum) = filter s pivot_index in
     let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 

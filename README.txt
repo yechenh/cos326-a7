@@ -20,10 +20,12 @@ Analyze your work and span numbers:
 Fill in the ? with an asymptotic complexity formula (see instructions).
 make_index work=? span=?
 search work=? span=?
-slow:precompute work=? span=?
-slow:compute work=? span=?
-fast:precompute work=? span=?
-fast:compute work=? span=?
+
+N = length of groups 
+slow:precompute work=N span=O(log N)
+slow:compute work=O(1) span=O(1)
+fast:precompute work=N span=O(log N)
+fast:compute work=O(1) span=O(1)
 
 Comments, Problems and Design Decisions:
 ----------------------------------------

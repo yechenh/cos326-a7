@@ -248,7 +248,7 @@ let quicksort (s: 'a S.t) (compare:'a -> 'a -> int): 'a S.t =
     let l = S.length s in 
     if l <= 1 then s
     else 
-    let (pivot_pop, pivot_index) = S.nth s 0 in 
+    (* let (pivot_pop, pivot_index) = S.nth s 0 in  *)
     let (_, pivot_index) = S.nth s (l/2) in 
     let (two_sub_sequences, pop_sum) = filter s pivot_index in
     let sorted_two_subsequences = S.map quicksort_aux two_sub_sequences in 
@@ -323,8 +323,8 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     let r,c = rowcol_of_latlon us_area (rows,cols) (lat,lon) in 
     (pop, r*cols + c)) groups 
   in 
-  (* let onedim = make_onedim_grid group_with_r_c (rows * cols) in  *)
-  let onedim = make_one_dim_grid_v2 group_with_r_c (rows * cols) in 
+  let onedim = make_onedim_grid group_with_r_c (rows * cols) in 
+  (* let onedim = make_one_dim_grid_v2 group_with_r_c (rows * cols) in  *)
   let twodim = create_2d_matrix (rows, cols) onedim in
   let prefix_sum x = S.scan (+) 0 x in 
   let cols_summed = S.map prefix_sum twodim in 
