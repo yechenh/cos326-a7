@@ -20,11 +20,11 @@
 # Target: parse.cmx, tags: { compile, extension:cmx, extension:ml, file:parse.cmx, file:parse.ml, implem, native, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o parse.cmx parse.ml # cached
 # Target: query.ml.depends, tags: { extension:ml, file:query.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.ml > query.ml.depends
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules query.ml > query.ml.depends # cached
 # Target: sequence.ml.depends, tags: { extension:ml, file:sequence.ml, ocaml, ocamldep, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules sequence.ml > sequence.ml.depends # cached
+/Users/yechenhu/.opam/4.09.0/bin/ocamldep.opt -modules sequence.ml > sequence.ml.depends
 # Target: sequence.cmx, tags: { compile, extension:cmx, extension:ml, file:sequence.cmx, file:sequence.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o sequence.cmx sequence.ml # cached
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o sequence.cmx sequence.ml
 # Target: query.cmx, tags: { compile, extension:cmx, extension:ml, file:query.cmx, file:query.ml, implem, native, ocaml, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml
 + /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o query.cmx query.ml
@@ -53,7 +53,16 @@ File "query.ml", line 251, characters 9-18:
                ^^^^^^^^^
 Warning 26: unused variable pivot_pop.
 # Target: population.cmx, tags: { compile, extension:cmx, extension:ml, file:population.cmx, file:population.ml, implem, native, ocaml, quiet }
-/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml # cached
+/Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
++ /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt -c -o population.cmx population.ml
+File "population.ml", line 58, characters 5-20:
+58 |      Pervasives.exit 0)
+          ^^^^^^^^^^^^^^^
+Alert deprecated: module Stdlib.Pervasives
+Use Stdlib instead.
+
+If you need to stay compatible with OCaml < 4.07, you can use the 
+stdlib-shims library: https://github.com/ocaml/stdlib-shims
 # Target: population.native, tags: { dont_link_with, extension:native, file:population.native, link, native, ocaml, program, quiet }
 /Users/yechenhu/.opam/4.09.0/bin/ocamlopt.opt parse.cmx sequence.cmx query.cmx population.cmx -o population.native
 # Compilation successful.

@@ -157,13 +157,22 @@ module ArraySeqAlt : S = struct
   let singleton = ArraySeq.singleton
   let append = ArraySeq.append
   let nth = ArraySeq.nth
+  let split = ArraySeq.split
   let map = ArraySeq.map
-  let map_reduce = ArraySeq.map_reduce
+
+  let rec map_reduce (f: 'a -> 'b) (g: 'b -> 'b -> 'b) (base: 'b) (a: 'a t) : 'b =
+    let l = length a in 
+    if l = 0 then base else
+    if l = 1 then g (f (nth a 0)) base else
+    let left, right = split a (l/2) in 
+    let subsequences = cons left (singleton right) in 
+    let result_subsequences = map (map_reduce f g base) subsequences in 
+    g (nth result_subsequences 0) (nth result_subsequences 1)
+
   let reduce g base a = map_reduce (fun x -> x) g base a
   let flatten = ArraySeq.flatten
   let repeat = ArraySeq.repeat
   let zip = ArraySeq.zip
-  let split = ArraySeq.split
   let scan= ArraySeq.scan
 end       
 
