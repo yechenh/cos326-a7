@@ -171,7 +171,8 @@ module ArraySeqAlt : S = struct
     
   let map_reduce f g base a =
   let rec divide arr = 
-    if (length arr = 1) then f (nth arr 0)
+    if (length arr = 0) then base 
+    else if (length arr = 1) then f (nth arr 0)
     else let (first_half, last_half) = split arr ((length arr)/2) in 
     g (divide first_half) (divide last_half)
   in divide a
@@ -266,6 +267,6 @@ module Accounting (M: S) : SCount =
     end
   end
 
-module Acc = Accounting(ArraySeqAlt)
+module Acc = Accounting(ArraySeq)
 module S = Acc.SM
     

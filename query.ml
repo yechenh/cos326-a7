@@ -323,8 +323,8 @@ let precompute (groups: group S.t) (us_area: area) (rows,cols) : int S.t S.t =
     let r,c = rowcol_of_latlon us_area (rows,cols) (lat,lon) in 
     (pop, r*cols + c)) groups 
   in 
-  (* let onedim = make_onedim_grid group_with_r_c (rows * cols) in  *)
-  let onedim = make_one_dim_grid_v2 group_with_r_c (rows * cols) in 
+  let onedim = make_onedim_grid group_with_r_c (rows * cols) in 
+  (* let onedim = make_one_dim_grid_v2 group_with_r_c (rows * cols) in  *)
   let twodim = create_2d_matrix (rows, cols) onedim in
   let prefix_sum x = S.scan (+) 0 x in 
   let cols_summed = S.map prefix_sum twodim in 

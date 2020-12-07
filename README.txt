@@ -6,14 +6,14 @@ Report your work and span numbers:
 Fill in the ? with your actual numbers.
 
 Running: main_index.native data/test_index_1000.txt for a year
-make_index work=? span=?
-search work=? span=?
+make_index work=15558288 span=11378
+search work=10212454 span=40
 
 Running: population.native data/CenPop2010.txt 20 40 26 4 30 7
-slow:precompute work=? span=?
-slow:compute work=? span=?
-fast:precompute work=? span=?
-fast:compute work=? span=?
+slow:precompute work=660999 span=39
+slow:compute work=220333 span=19
+fast:precompute work=14540392 span=822
+fast:compute work=8 span=8
 
 Analyze your work and span numbers:
 ----------------------------------
@@ -23,13 +23,17 @@ search work=? span=?
 
 N = length of groups 
 slow:precompute work=N span=O(log N)
-slow:compute work=O(1) span=O(1)
+slow:compute work=N span=O(log N)
 fast:precompute work=N span=O(log N)
 fast:compute work=O(1) span=O(1)
 
 Comments, Problems and Design Decisions:
 ----------------------------------------
-
+Using simple version for precompute
+slow:precompute work=660999 span=39
+slow:compute work=220333 span=19
+fast:precompute work=353417472 span=81
+fast:compute work=8 span=8
 
 
 
