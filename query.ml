@@ -288,6 +288,9 @@ let make_onedim_grid (s: (int*int) S.t) (max: int) : int S.t =
   in 
   S.map (fun x -> let a, _ = x in a) filled_zero 
 
+(* Brute-force or sequential but also parallel version of making a 
+    one-dimensional grid. Is not used later, but it is functioning. This design 
+    choice is explained in the readme. *)
 let make_one_dim_grid_v2 (s: (int*int) S.t) (max: int) : int S.t = 
   let aux i = 
     let aux_map x = let pop, index = x in if index = i then pop else 0 in 

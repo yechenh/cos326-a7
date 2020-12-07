@@ -1,5 +1,5 @@
 Netids (include all members of group, if parternering):
-  [list here]
+  yechenh, lt7
 
 Report your work and span numbers:
 ----------------------------------
@@ -18,25 +18,48 @@ fast:compute work=8 span=8
 Analyze your work and span numbers:
 ----------------------------------
 Fill in the ? with an asymptotic complexity formula (see instructions).
-make_index work=? span=?
-search work=? span=?
 
-N = length of groups 
-slow:precompute work=N span=O(log N)
-slow:compute work=N span=O(log N)
-fast:precompute work=N span=O(log N)
+N = total number of words in all documents
+make_index work=O(NlogN) span=O(log^2 N)
+
+N = length of the query string
+M = average number of occurences of each query word in all documents
+search work=O(N * M^2) span=O(logN * logM)
+
+
+N = length of groups (i.e. the length of the census data)
+slow:precompute work=O(N) span=O(log N)
+slow:compute work=O(N) span=O(log N)
+fast:precompute work=O(NlogN) span=O(log^2 N)
 fast:compute work=O(1) span=O(1)
 
 Comments, Problems and Design Decisions:
 ----------------------------------------
-Using simple version for precompute
-slow:precompute work=660999 span=39
-slow:compute work=220333 span=19
-fast:precompute work=353417472 span=81
-fast:compute work=8 span=8
+We have also implemented a more brute-force or sequential version of making
+a one dimensional grid in sequence.ml. The function has the name 
+make_one_dim_grid_v2. Using this function, we get the same result as the 
+reference and our other implementation, but the work and span is different.
+This bruteforce version has 
 
+precompute work=353417472 span=81
+compute work=8 span=8
 
+which has a much smaller span than our other implementation (the implementation
+suggested by the assignment specification). However, the work is much larger
+than our other implementation. In general, using the time complexity as above, 
+its complexity would be 
 
+N = length of groups (i.e. the length of the census data)
+R = number of rows
+C = number of columns
+precompute work=O(N*R*C) span=O(log N)
+compute work=O(1) span=O(1)
+
+which explains why this bruteforce implementation has smaller span and larger
+work. We commented out this implementation, although it also uses the Sequence 
+library and is also parallel, simply because it does not follow what is 
+suggested in the assignment specification and it is a more bruteforce way
+of forming a one-dimensional grid.
 
 
 Suggestions for the Future or Random Comments:
@@ -56,7 +79,7 @@ In doing this homework I used the following sources:
 
 This paper represents my own work in accordance with University regulations.
 
-Signed, [your name(s):]
+Signed, [your name(s):] Yechen Hu, Lauren Tange
 
 ------------------------------------------------------------------------
 
